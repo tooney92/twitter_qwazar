@@ -1,3 +1,14 @@
+<% flash.each do |type, msg| %>
+    <% if type == "error" %>
+        <div class="alert alert-danger"><%= msg %> </div>
+    <% elsif type == "success" %>
+        <div class= "alert alert-success"><%= msg %> </div>
+    <% elsif type == "info" %>
+        <div class= "alert alert-danger"><%= msg %> </div>
+    <% end %>
+<% end %>
+
+
 <%= form_with scope: :user, url: users_path,  local: true do |form| %>
   <p>
     <%= form.label :user_name %><br>
@@ -13,11 +24,6 @@
     <%= form.label :password %><br>
     <%= form.password_field :password, :class => "form-control" %>
   </p>  
-
-  <p>
-    <%= form.label :confirm_password %><br>
-    <%= form.password_field :confirm_password, :class => "form-control" %>
-  </p>
 
   <p>
     <%= form.submit "Sign Up", :class => "btn, btn-primary"%>
