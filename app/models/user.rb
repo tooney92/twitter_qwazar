@@ -42,9 +42,13 @@ class User
         return user
     end
 
-    def exists(username)
-        if  $redis.get(username) != nil
-            return true
+    def exists(username, email)
+        if  $redis.sismember("username", username)
+            return "username already exists"
+        elsif $redis.sismember("email", email)
+            return "email already exists"
+        else
+            return false
         end
     end
     #$.sadd("myset", "mail")

@@ -22,14 +22,23 @@ class UsersController < ApplicationController
     # POST /users.json
     def create
       @user = User.new()
-      if @user.exists(user_params[:user_name])
+      if @user.exists(user_params[:user_name], user_params[:email]) == "username already exists"
         flash[:error] = "username: #{user_params[:user_name]} already exists!"
+        redirect_to new_user_path
+      elsif @user.exists(user_params[:user_name], user_params[:email]) == "email already exists"
+        flash[:error] = "email: #{user_params[:email]} already exists!"
         redirect_to new_user_path
       elsif user_params[:email] == "" and user_params[:password] == ""
         flash[:error] = "please provide email and password"
         redirect_to new_user_path
       elsif user_params[:email] == ""
         flash[:error] = "empty email field!!!!"
+        redirect_to new_user_path
+      elsif user_params[:password] == ""
+        flash[:error] = "please provide password"
+        redirect_to new_user_path
+      elsif user_params[:password].length < 8
+        flash[:error] = "minimum of 8 characters for password!"
         redirect_to new_user_path
       elsif user_params[:password] == ""
         flash[:error] = "please provide password"
