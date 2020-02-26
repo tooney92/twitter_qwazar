@@ -8,7 +8,6 @@ class UsersController < ApplicationController
     def index
         @user = User.new()
     #   render plain: User.fetch()
-      render plain: @user.fetch()
     end
     # GET /users/1
     # GET /users/1.json
@@ -24,7 +23,7 @@ class UsersController < ApplicationController
       @user = User.new()
       @user.add(user_params[:user_name], user_params[:password], user_params[:email])
       if @user.save
-        render plain: @user.user_id()
+      render plain: "getkey: #{@user.getkey(user_params[:user_name])}, #{@user.fetch_user(user_params[:user_name])}, #{user_params[:user_name]}"
       end
     end
 
