@@ -52,10 +52,17 @@ class UsersController < ApplicationController
 
     def login_user
         @user = User.new()
-        # render plain: "i am test page! #{@user.auth(session[:user_name], 123)}, #{@user.fetch_user(session[:user_name])}"
-        test = @user.auth(user_params[:user_name], user_params[:password])
-        render plain: test
-        # session[:user_name] = user_paruser_params[:user_name]ams[:user_name]
+        status = @user.auth(user_params[:user_name], user_params[:password])
+        if status.is_a?(String)
+            flash[:error] = "invalid user name"
+            redirect_to login_path
+        elsif status == false
+            flash[:error] = "invalid password"
+            redirect_to login_path
+        else
+            render plain: "legit"
+        end
+        
     end
 
     private
