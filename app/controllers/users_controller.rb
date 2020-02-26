@@ -23,8 +23,14 @@ class UsersController < ApplicationController
       @user = User.new()
       @user.add(user_params[:user_name], user_params[:password], user_params[:email])
       if @user.save
-      render plain: "getkey: #{@user.getkey(user_params[:user_name])}, #{@user.fetch_user(user_params[:user_name])}, #{user_params[:user_name]}"
+      session[:user_name] = user_params[:user_name]
+      redirect_to test_path
       end
+    end
+
+    def test
+        @user = User.new()
+        render plain: "i am test page! #{@user.fetch_user(session[:user_name])}"
     end
 
     private
