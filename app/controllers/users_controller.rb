@@ -1,28 +1,48 @@
 class UsersController < ApplicationController
-    # require "scrypt"
-     before_action :logged_in?, :only => [:index,:show, :edit, :destroy, :update]
-    # GET /users
-    # GET /users.json
-    def new
-    end
+  before_action :logged_in?, :only => [:show, :edit, :destroy, :update]
 
-    def index
-        @user = User.new()
-      # render plain: "opop"
-    end
-    # GET /users/1
-    # GET /users/1.json
-    def show
-       user = User.new()
-      # @userModel = User.fetch_user( 1 )
-       @userModel = user.fetch_user(session[:userName])
-      #  render plain: @userModel.inspect
-    end
-    def follow
+  def new
+  end
+  
+  def index
+    @user = User.new()
+    render plain: "opop"
+  end
+  
+  def show
+    # https://pbs.twimg.com/profile_images/469997005582790656/iGxrQ1FS_400x400.jpeg
+    # https://pbs.twimg.com/media/ERes8ClVAAAT47S?format=jpg&name=medium
+    @user = User.new()
+    user = params[:id]
+    @user_profile_url = ""
+    @user_banner_url = ""
+
+      if  $redis.get(user) == nil
+        render plain: "sorry user does not exist!"
+
+      elsif  @user.fetch_user(user)["profile_image_url"] == "nil" and @user.fetch_user(user)["profile_banner_url"] == "nil" 
+        @user_profile_url = "https://pbs.twimg.com/profile_images/469997005582790656/iGxrQ1FS_400x400.jpeg"
+        @user_banner_url = "https://pbs.twimg.com/media/ERes8ClVAAAT47S?format=jpg&name=medium"
+        
+        
+      elsif  @user.fetch_user(user)["profile_banner_url"] != "nil" and @user.fetch_user(user)["profile_image_url"] != "nil"
+        @user_profile_url = @user.fetch_user(user)["profile_image_url"]
+        @user_banner_url = @user.fetch_user(user)["profile_banner_url"]
+        
+      elsif  @user.fetch_user(user)["profile_banner_url"] != "nil" and @user.fetch_user(user)["profile_image_url"] == "nil"
+        @user_profile_url = "https://pbs.twimg.com/profile_images/469997005582790656/iGxrQ1FS_400x400.jpeg"
+        @user_banner_url = @user.fetch_user(user)["profile_banner_url"]
+
+      elsif  @user.fetch_user(user)["profile_banner_url"] == "nil" and @user.fetch_user(user)["profile_image_url"] != "nil"
+        @user_profile_url = @user.fetch_user(user)["profile_image_url"]
+        @user_banner_url = "https://pbs.twimg.com/media/ERes8ClVAAAT47S?format=jpg&name=medium"
+        
+      else
+        @userName = @user.fetch_user(user)["username"]
+        @user_id = @user.getkey(user)
+      end
     end
     
-    # GET /users/new
-    # GET /users/1/edit
     def edit
     end
 
@@ -38,10 +58,21 @@ class UsersController < ApplicationController
           content_type: user_params[:image].content_type
         )
         image_url = url_for(blob)
+      end
+      if user_params[:banner].blank?
+        banner_url = @user.fetch_user(session[:userName])["profile_banner_url"]
+      else
+        blob = ActiveStorage::Blob.create_after_upload!(
+          io: user_params[:banner],
+          filename: user_params[:banner].original_filename,
+          content_type: user_params[:banner].content_type
+        )
+        banner_url = url_for(blob)
         # session[:url] = url_for(blob).inspect
       end
-      @user.profile_update(session[:userName], user_params[:bio], user_params[:location], user_params[:date_of_birth], user_params[:website], image_url )
-      redirect_to user_path(session[:userName])
+      @user.profile_update(session[:userName], user_params[:bio], user_params[:location], user_params[:date_of_birth], user_params[:website], image_url , banner_url)
+      # render plain: @user.fetch_user(session[:userName])
+      redirect_to user_path(session[:userName])    
       
     end
   
@@ -76,7 +107,7 @@ class UsersController < ApplicationController
         @user.add(user_params[:user_name], user_params[:password], user_params[:email])
         @user.save
         # render plain: user_params.inspect
-        redirect_to new_user_path
+        redirect_to login_path
        end
         # render plain: user_params.inspect
     end
@@ -87,13 +118,14 @@ class UsersController < ApplicationController
 
     def login_user
         @user = User.new()
+
         status = @user.auth(user_params[:user_name], user_params[:password])
         if status.is_a?(String)
             flash[:error] = "invalid user name"
-            redirect_to new_user_path
+            redirect_to login_path
         elsif status == false
             flash[:error] = "invalid password"
-            redirect_to new_user_path
+            redirect_to login_path
         else
             userName = @user.fetch_user(user_params[:user_name])["username"]       
             session[:userName] = userName
@@ -105,13 +137,13 @@ class UsersController < ApplicationController
     def log_out
       session[:userName] = nil
       flash[:alert] = "logged out"
-      redirect_to new_user_path
+      redirect_to login_path
     end
 
 
     private
         def user_params
-            params.require(:user).permit(:user_name, :email, :password, :bio, :location, :date_of_birth, :website, :image)
+            params.require(:user).permit(:user_name, :email, :password, :bio, :location, :date_of_birth, :website, :image, :banner)
         end
     
 end
