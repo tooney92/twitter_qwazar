@@ -1,25 +1,20 @@
 class UsersController < ApplicationController
-    # require "scrypt"
-    before_action :set_user, only: [:show, :edit, :update, :destroy]
-    # GET /users
-    # GET /users.json
-    def new
-    end
+  before_action :logged_in?, :only => [:show, :edit, :destroy]
 
-    def index
-        @user = User.new()
-      render plain: "opop"
-    end
-    # GET /users/1
-    # GET /users/1.json
+  def new
+  end
+  
+  def index
+    @user = User.new()
+    render plain: "opop"
+  end
+  
     def show
     end
-    # GET /users/new
-    # GET /users/1/edit
+    
     def edit
     end
-    # POST /users
-    # POST /users.json
+  
     def create
       @user = User.new()
       if @user.exists(user_params[:user_name], user_params[:email]) == "username already exists"
@@ -51,7 +46,7 @@ class UsersController < ApplicationController
         @user.save
         # render plain: user_params.inspect
         redirect_to login_path
-      end
+       end
         # render plain: user_params.inspect
     end
 
@@ -61,6 +56,7 @@ class UsersController < ApplicationController
 
     def login_user
         @user = User.new()
+        username = "sss"
         status = @user.auth(user_params[:user_name], user_params[:password])
         if status.is_a?(String)
             flash[:error] = "invalid user name"
@@ -69,10 +65,19 @@ class UsersController < ApplicationController
             flash[:error] = "invalid password"
             redirect_to login_path
         else
-            render plain: "legit"
+            userName = @user.fetch_user(user_params[:user_name])["username"]       
+            session[:userName] = userName
+            user_id = @user.getkey(session[:userName])
+            redirect_to user_path(userName)
         end
-        
     end
+
+    def log_out
+      session[:userName] = nil
+      flash[:alert] = "logged out"
+      redirect_to login_path
+    end
+
 
     private
         def user_params

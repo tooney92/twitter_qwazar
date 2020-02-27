@@ -7,8 +7,9 @@ class User
         @email = email
     end
     def save
+        @auth =
         @id = $redis.incr("users")
-        $redis.hmset("user:#{@id}", "username", @username, "password", @password, "email", @email, "date_joined", Time.now().strftime("joined %B, %Y"), "salt", @salt)
+        $redis.hmset("user:#{@id}", "username", @username, "password", @password, "email", @email, "date_joined", Time.now().strftime("%B, %Y"), "salt", @salt, "bio", "nil", "location", "nil", "date_of_birth", "nil", "website", "nil", "profile_image_url", "nil")
         $redis.set(@username, @id)
         $redis.sadd("email", @email)
         $redis.sadd("username", @username)
