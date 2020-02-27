@@ -33,7 +33,7 @@
   
 <% end %>
 
-<% img_url = @user.fetch_user(@userName)["profile_image_url"] %>
+<% img_url = @usermodel["profile_image_url"] %>
 <%= image_tag  img_url, :alt => "pic of me", :width => "90px", :height => "90px" %>
 
 
