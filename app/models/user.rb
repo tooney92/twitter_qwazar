@@ -16,8 +16,8 @@ class User
         return true
     end
 
-    def profile_update(username, bio, location, date_of_birth, website)
-        $redis.hmset("user:#{getkey(username)}", "bio", bio, "location", location, "date_of_birth", date_of_birth, "website", website)
+    def profile_update(username, bio, location, date_of_birth, website, image)
+        $redis.hmset("user:#{getkey(username)}", "bio", bio, "location", location, "date_of_birth", date_of_birth, "website", website, "profile_image_url", image)
     end
 
     def auth(username, password)
