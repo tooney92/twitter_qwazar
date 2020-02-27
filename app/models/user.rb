@@ -9,15 +9,15 @@ class User
     def save
         @auth =
         @id = $redis.incr("users")
-        $redis.hmset("user:#{@id}", "username", @username, "password", @password, "email", @email, "date_joined", Time.now().strftime("%B, %Y"), "salt", @salt, "bio", "nil", "location", "nil", "date_of_birth", "nil", "website", "nil", "profile_image_url", "nil")
+        $redis.hmset("user:#{@id}", "username", @username, "password", @password, "email", @email, "date_joined", Time.now().strftime("%B, %Y"), "salt", @salt, "bio", "nil", "location", "nil", "date_of_birth", "nil", "website", "nil", "profile_image_url", "nil","profile_banner_url", "nil")
         $redis.set(@username, @id)
         $redis.sadd("email", @email)
         $redis.sadd("username", @username)
         return true
     end
 
-    def profile_update(username, bio, location, date_of_birth, website, image)
-        $redis.hmset("user:#{getkey(username)}", "bio", bio, "location", location, "date_of_birth", date_of_birth, "website", website, "profile_image_url", image)
+    def profile_update(username, bio, location, date_of_birth, website, image,banner)
+        $redis.hmset("user:#{getkey(username)}", "bio", bio, "location", location, "date_of_birth", date_of_birth, "website", website, "profile_image_url", image, "profile_banner_url", banner )
     end
 
     def auth(username, password)

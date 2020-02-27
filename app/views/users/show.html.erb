@@ -17,9 +17,10 @@
        </div>
           <div class="card mb-3">
             <img
-              src="https://pbs.twimg.com/profile_banners/324608779/1538119679/1080x360"
+               src="<%= @userModel["profile_banner_url"] %>"
               class="card-img-top"
               alt="..."
+              height="250px"
             />
             <div class="card-body">
               <div class="card-title img">
@@ -29,6 +30,7 @@
                   src="<%= @userModel["profile_image_url"] %>"
                   class="rounded-circle"
                   width="100px"
+                  height="100px"
                   style="border: 2;"
                 />
                
@@ -66,10 +68,16 @@
                       <div class="modal-body">
                    <%= form_with scope: :user, url: user_path, method: :patch, local: true do |form| %>
                        <div class="form-group">
-                        <label for="bio" class="form-text text-muted"
+                        <label for="profile_image" class="form-text text-muted"
                           >Profile Image</label
                       >
-                           <%= form.file_field :image, :class => "form-control" %>
+                           <%= form.file_field :image, :class => "form-control",  :value =>  @userModel["profile_image_url"]  %>
+                       </div>
+                        <div class="form-group">
+                        <label for="profile_banner" class="form-text text-muted"
+                          >Profile Banner</label
+                      >
+                           <%= form.file_field :banner, :class => "form-control",  :value =>  @userModel["profile_banner_url"]  %>
                        </div>
                       <div class="form-group">
                       <label for="bio" class="form-text text-muted"
@@ -238,7 +246,8 @@
                       draggable="true"
                        src="<%= @userModel["profile_image_url"] %>"
                       class="rounded-circle"
-                      width="45px"
+                      width="55px"
+                      height="55px"
                     />
                     <p class="card-text ml-2 mt-2">
                       <%= @userModel["username"] %> <span class="text-muted"> @<%= @userModel["username"] %> . 11m</span>
