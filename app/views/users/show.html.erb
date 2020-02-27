@@ -4,6 +4,8 @@
 
 <h1>EDIT</h1>
 
+<h1> Welcome <%= @userName %> </h1>
+
 <%= form_with scope: :user, url: user_path,  local: true, method: :patch do |form| %>
   <p>
     <%= form.label :bio %><br>
@@ -25,6 +27,10 @@
     <%= form.label :image %><br>
     <%= form.file_field :image, :class => "form-control" %>
   </p>
+  <p>
+    <%= form.label :chnage_banner %><br>
+    <%= form.file_field :banner, :class => "form-control" %>
+  </p>
   
   <p>
     <%= form.submit "update", :class => "btn, btn-primary"%>
@@ -32,8 +38,12 @@
 
   
 <% end %>
-
-<% img_url = @usermodel["profile_image_url"] %>
+<h3>profile</h3>
+<% img_url = @user_profile_url %>
 <%= image_tag  img_url, :alt => "pic of me", :width => "90px", :height => "90px" %>
+<br>
+<h3>banner</h3>
+<% banner_url = @user_banner_url %>
+<%= image_tag  banner_url, :alt => "pic of me", :width => "90px", :height => "90px" %>
 
 
