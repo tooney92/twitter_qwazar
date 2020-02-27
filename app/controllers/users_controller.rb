@@ -5,8 +5,6 @@ class UsersController < ApplicationController
   end
   
   def index
-    @user = User.new()
-    render plain: "opop"
   end
   
   def show
@@ -103,8 +101,11 @@ class UsersController < ApplicationController
       elsif user_params[:user_name].include?" "
         flash[:error] = "invalid user name! no spaces!"
         redirect_to new_user_path
+      elsif user_params[:email].include?" "
+        flash[:error] = "invalid email! no spaces!"
+        redirect_to new_user_path
       else
-        @user.add(user_params[:user_name], user_params[:password], user_params[:email])
+        @user.add(user_params[:user_name].strip, user_params[:password], user_params[:email].strip)
         @user.save
         # render plain: user_params.inspect
         redirect_to login_path
@@ -138,6 +139,40 @@ class UsersController < ApplicationController
       session[:userName] = nil
       flash[:alert] = "logged out"
       redirect_to login_path
+    end
+
+    def forgot_password
+
+    end
+
+    def mail_password_reset
+      @user = User.new()
+      if $redis.sismember("email", user_params[:email])
+        token = @user.set_token(user_params[:email])
+        @generated_url = "/password_reset/#{user_params[:email]}/#{token}"
+        redirect_to "/password_reset/#{token}"
+
+      else
+        flash[:error] = "email does not exist!"
+        redirect_to forgot_password_path
+      end
+
+    end
+
+
+    def password_reset
+      @user = User.new()
+      user_email = @user.token_get_email(params[:token])
+      # render plain: "#{user_email}, #{@user.email_fetch_user(user_email)} "
+    end
+
+    def update_password
+      @user = User.new()
+      user = $redis.get(@user.token_get_email(params[:token]))
+      former = @user.fetch_user(user)
+      user_key = @user.getkey(user)
+      # $redis.hgetall("user:#{user_key}", "password", user_params[:password])
+      render plain: "#{user}, #{user_key} #{user_params[:password]}"
     end
 
 

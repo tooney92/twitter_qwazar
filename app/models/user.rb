@@ -11,7 +11,8 @@ class User
         @id = $redis.incr("users")
         $redis.hmset("user:#{@id}", "username", @username, "password", @password, "email", @email, "date_joined", Time.now().strftime("%B, %Y"), "salt", @salt, "bio", "nil", "location", "nil", "date_of_birth", "nil", "website", "nil", "profile_image_url", "nil", "profile_banner_url", "nil")
         $redis.set(@username, @id)
-        $redis.set(@username, @id)
+        $redis.set(@id, @username)
+        $redis.set(@email, @username)
         $redis.sadd("email", @email)
         $redis.sadd("username", @username)
         return true
@@ -56,6 +57,28 @@ class User
         else
             return false
         end
+    end
+
+    def set_token(email)
+        token = SecureRandom.base64(8)
+        if token[0] == "/"
+            token = SecureRandom.base64(8)
+        end
+        $redis.set(token, email)
+        return token
+    end
+
+    def token_get_email(token)
+        return $redis.get(token)
+    end
+
+    def email_fetch_user(email)
+        return $redis.get(email)
+    end
+
+    def hash_password(password)
+        salt = SecureRandom.base64(8)
+        encrypted_password = Digest::SHA2.hexdigest(salt + password)
     end
 
 end
