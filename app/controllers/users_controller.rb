@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :logged_in?, :only => [:show, :edit, :destroy]
+  before_action :logged_in?, :only => [:show, :edit, :destroy, :update]
 
   def new
   end
@@ -10,9 +10,18 @@ class UsersController < ApplicationController
   end
   
     def show
+      @user = User.new()
+      @userName = @user.fetch_user(session[:userName])["username"]
+      @user_id = @user.getkey(session[:userName])
     end
     
     def edit
+    end
+
+    def update
+      @user = User.new()
+      @user.profile_update(session[:userName], user_params[:bio], user_params[:location], user_params[:date_of_birth], user_params[:website])
+      redirect_to user_path(session[:userName])
     end
   
     def create
@@ -56,7 +65,7 @@ class UsersController < ApplicationController
 
     def login_user
         @user = User.new()
-        username = "sss"
+
         status = @user.auth(user_params[:user_name], user_params[:password])
         if status.is_a?(String)
             flash[:error] = "invalid user name"
@@ -81,7 +90,7 @@ class UsersController < ApplicationController
 
     private
         def user_params
-            params.require(:user).permit(:user_name, :email, :password)
+            params.require(:user).permit(:user_name, :email, :password, :bio, :location, :date_of_birth, :website)
         end
     
 end

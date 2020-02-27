@@ -16,6 +16,10 @@ class User
         return true
     end
 
+    def profile_update(username, bio, location, date_of_birth, website)
+        $redis.hmset("user:#{getkey(username)}", "bio", bio, "location", location, "date_of_birth", date_of_birth, "website", website)
+    end
+
     def auth(username, password)
         if $redis.get(username) == nil
             return "sorry invalid name!"
@@ -52,8 +56,5 @@ class User
             return false
         end
     end
-    #$.sadd("myset", "mail")
-    # self.salt = ActiveSupport::SecureRandom.base64(8)
-    # self.hashed_password = Digest::SHA2.hexdigest(self.salt + submitted_password)
 
 end
