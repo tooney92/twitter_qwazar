@@ -1,0 +1,39 @@
+<p> i am show page </p>
+<%# <%= "hello" %> %>
+<%= link_to "logout",  logout_path%>
+
+<h1>EDIT</h1>
+
+<%= form_with scope: :user, url: user_path,  local: true, method: :patch do |form| %>
+  <p>
+    <%= form.label :bio %><br>
+    <%= form.text_area :bio, :class => "form-control" %>
+  </p>
+  <p>
+    <%= form.label :location %><br>
+    <%= form.text_field :location, :class => "form-control" %>
+  </p>
+  <p>
+    <%= form.label :date_of_birth %><br>
+    <%= form.date_field :date_of_birth,  :class => "form-control" %>
+  </p>
+  <p>
+    <%= form.label :website %><br>
+    <%= form.text_field :website, :class => "form-control" %>
+  </p>
+  <p>
+    <%= form.label :image %><br>
+    <%= form.file_field :image, :class => "form-control" %>
+  </p>
+  
+  <p>
+    <%= form.submit "update", :class => "btn, btn-primary"%>
+  </p>
+
+  
+<% end %>
+
+<% img_url = @user.fetch_user(@userName)["profile_image_url"] %>
+<%= image_tag  img_url, :alt => "pic of me", :width => "90px", :height => "90px" %>
+
+
