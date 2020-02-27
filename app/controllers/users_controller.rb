@@ -1,64 +1,120 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :edit, :update, :destroy]
+    # require "scrypt"
+     before_action :logged_in?, :only => [:index,:show, :edit, :destroy, :update]
+    # GET /users
+    # GET /users.json
+    def new
+    end
 
-  # GET /users
-  # GET /users.json
-  def index
-    @users = User.all
-  end
+    def index
+        @user = User.new()
+      # render plain: "opop"
+    end
+    # GET /users/1
+    # GET /users/1.json
+    def show
+       user = User.new()
+      # @userModel = User.fetch_user( 1 )
+       @userModel = user.fetch_user(session[:userName])
+      #  render plain: @userModel.inspect
+    end
+    def follow
+    end
+    
+    # GET /users/new
+    # GET /users/1/edit
+    def edit
+    end
 
-  # GET /users/1
-  # GET /users/1.json
-  def show
-  end
-
-  # GET /users/new
-  def new
-  end
-
-  # GET /users/1/edit
-  def edit
-  end
-
-  # POST /users
-  # POST /users.json
-  def create
-    @user = User.new(user_params)
-    @user.save
-  end
-
-  # PATCH/PUT /users/1
-  # PATCH/PUT /users/1.json
-  def update
-    respond_to do |format|
-      if @user.update(user_params)
-        format.html { redirect_to @user, notice: 'User was successfully updated.' }
-        format.json { render :show, status: :ok, location: @user }
+    def update
+      @user = User.new()
+      
+      if user_params[:image].blank?
+        image_url = @user.fetch_user(session[:userName])["profile_image_url"]
       else
-        format.html { render :edit }
-        format.json { render json: @user.errors, status: :unprocessable_entity }
+        blob = ActiveStorage::Blob.create_after_upload!(
+          io: user_params[:image],
+          filename: user_params[:image].original_filename,
+          content_type: user_params[:image].content_type
+        )
+        image_url = url_for(blob)
+        # session[:url] = url_for(blob).inspect
       end
+      @user.profile_update(session[:userName], user_params[:bio], user_params[:location], user_params[:date_of_birth], user_params[:website], image_url )
+      redirect_to user_path(session[:userName])
+      
     end
-  end
+  
 
-  # DELETE /users/1
-  # DELETE /users/1.json
-  def destroy
-    @user.destroy
-    respond_to do |format|
-      format.html { redirect_to users_url, notice: 'User was successfully destroyed.' }
-      format.json { head :no_content }
+    def create
+      @user = User.new()
+      if @user.exists(user_params[:user_name], user_params[:email]) == "username already exists"
+        flash[:error] = "username: #{user_params[:user_name]} already exists!"
+        redirect_to new_user_path
+      elsif @user.exists(user_params[:user_name], user_params[:email]) == "email already exists"
+        flash[:error] = "email: #{user_params[:email]} already exists!"
+        redirect_to new_user_path
+      elsif user_params[:email] == "" and user_params[:password] == ""
+        flash[:error] = "please provide email and password"
+        redirect_to new_user_path
+      elsif user_params[:email] == ""
+        flash[:error] = "empty email field!!!!"
+        redirect_to new_user_path
+      elsif user_params[:password] == ""
+        flash[:error] = "please provide password"
+        redirect_to new_user_path
+      elsif user_params[:password].length < 8
+        flash[:error] = "minimum of 8 characters for password!"
+        redirect_to new_user_path
+      elsif user_params[:password] == ""
+        flash[:error] = "please provide password"
+        redirect_to new_user_path
+      elsif user_params[:user_name].include?" "
+        flash[:error] = "invalid user name! no spaces!"
+        redirect_to new_user_path
+      else
+        @user.add(user_params[:user_name], user_params[:password], user_params[:email])
+        # @userMail = {username:user_params[:user_name], email:user_params[:email]}
+        # @user.save
+        UserMailer.with(email: user_params[:email], username:user_params[:user_name]).welcome_email.deliver_now
+        @user.save
+        # render plain: user_params.inspect
+        redirect_to new_user_path
+       end
+        # render plain: user_params.inspect
     end
-  end
 
-  private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_user
-      @user = User.find(params[:id])
+    def login
+
     end
 
-    # Only allow a list of trusted parameters through.
-    def user_params
-      params.require(:user).permit(:username, :password, :email)
+    def login_user
+        @user = User.new()
+        status = @user.auth(user_params[:user_name], user_params[:password])
+        if status.is_a?(String)
+            flash[:error] = "invalid user name"
+            redirect_to new_user_path
+        elsif status == false
+            flash[:error] = "invalid password"
+            redirect_to new_user_path
+        else
+            userName = @user.fetch_user(user_params[:user_name])["username"]       
+            session[:userName] = userName
+            user_id = @user.getkey(session[:userName])
+            redirect_to user_path(userName)
+        end
     end
+
+    def log_out
+      session[:userName] = nil
+      flash[:alert] = "logged out"
+      redirect_to new_user_path
+    end
+
+
+    private
+        def user_params
+            params.require(:user).permit(:user_name, :email, :password, :bio, :location, :date_of_birth, :website, :image)
+        end
+    
 end
