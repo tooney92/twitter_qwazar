@@ -1,20 +1,28 @@
 class UsersController < ApplicationController
-  before_action :logged_in?, :only => [:show, :edit, :destroy, :update]
+    # require "scrypt"
+     before_action :logged_in?, :only => [:index,:show, :edit, :destroy, :update]
+    # GET /users
+    # GET /users.json
+    def new
+    end
 
-  def new
-  end
-  
-  def index
-    @user = User.new()
-    render plain: "opop"
-  end
-  
+    def index
+        @user = User.new()
+      # render plain: "opop"
+    end
+    # GET /users/1
+    # GET /users/1.json
     def show
-      @user = User.new()
-      @userName = @user.fetch_user(session[:userName])["username"]
-      @user_id = @user.getkey(session[:userName])
+       user = User.new()
+      # @userModel = User.fetch_user( 1 )
+       @userModel = user.fetch_user(session[:userName])
+      #  render plain: @userModel.inspect
+    end
+    def follow
     end
     
+    # GET /users/new
+    # GET /users/1/edit
     def edit
     end
 
@@ -68,7 +76,7 @@ class UsersController < ApplicationController
         @user.add(user_params[:user_name], user_params[:password], user_params[:email])
         @user.save
         # render plain: user_params.inspect
-        redirect_to login_path
+        redirect_to new_user_path
        end
         # render plain: user_params.inspect
     end
@@ -79,14 +87,13 @@ class UsersController < ApplicationController
 
     def login_user
         @user = User.new()
-
         status = @user.auth(user_params[:user_name], user_params[:password])
         if status.is_a?(String)
             flash[:error] = "invalid user name"
-            redirect_to login_path
+            redirect_to new_user_path
         elsif status == false
             flash[:error] = "invalid password"
-            redirect_to login_path
+            redirect_to new_user_path
         else
             userName = @user.fetch_user(user_params[:user_name])["username"]       
             session[:userName] = userName
@@ -98,7 +105,7 @@ class UsersController < ApplicationController
     def log_out
       session[:userName] = nil
       flash[:alert] = "logged out"
-      redirect_to login_path
+      redirect_to new_user_path
     end
 
 

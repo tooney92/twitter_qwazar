@@ -5,5 +5,6 @@ Rails.application.routes.draw do
   get "/login" => "users#login"
   get "/logout" => "users#log_out"
   post "/login" => "users#login_user"
+ 
   root "users#new"
 end
