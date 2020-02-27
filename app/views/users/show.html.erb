@@ -1,4 +1,6 @@
  
+       <div class="card">
+       <div class="card-body">
           <div class="heading2">
             <a href="index.html">
               <svg class="arrow">
@@ -8,10 +10,11 @@
               </svg>
             </a>
             <div class="user-head">
-              <h3 class="mb-0">amirDBT</h3>
+              <h3 class="mb-0"> <%= @userModel["username"]%> </h3>
               <span class="text-muted">1,672 Tweets</span>
             </div>
-          </div>
+          </div></div>
+       </div>
           <div class="card mb-3">
             <img
               src="https://pbs.twimg.com/profile_banners/324608779/1538119679/1080x360"
@@ -31,8 +34,8 @@
               </div>
               <div class="user-profile">
                 <p class="card-text">
-                  <strong>amirDbt</strong> <br />
-                  <span class="text-muted">@amirdbt</span>
+                  <strong><%= @userModel["username"]%> </strong> <br />
+                  <span class="text-muted">@<%= @userModel["username"]%> </span>
                 </p>
                 <button
                   class="btn btn-outline-primary btn2"
@@ -58,68 +61,40 @@
                         <h5 class="modal-title" id="exampleModalLabel">
                           Edit profile
                         </h5>
-                        <button type="button" class="btn btn-primary btn2">
-                          Save changes
-                        </button>
+    
                       </div>
                       <div class="modal-body">
-                        <form>
-                          <div class="form-group">
-                            <label for="name" class="form-text text-muted"
-                              >Name</label
-                            >
-                            <input
-                              type="text"
-                              class="form-control"
-                              id="name"
-                              aria-describedby="name"
-                            />
-                          </div>
-                          <div class="form-group">
-                            <label for="bio" class="form-text text-muted"
-                              >Bio</label
-                            >
-                            <input
-                              type="text"
-                              class="form-control"
-                              id="bio"
-                              aria-describedby="bio"
-                            />
-                          </div>
-                          <div class="form-group">
-                            <label for="location" class="form-text text-muted"
-                              >Location</label
-                            >
-                            <input
-                              type="text"
-                              class="form-control"
-                              id="location"
-                              aria-describedby="location"
-                            />
-                          </div>
-                          <div class="form-group">
-                            <label for="website" class="form-text text-muted"
-                              >Website</label
-                            >
-                            <input
-                              type="text"
-                              class="form-control"
-                              id="website"
-                              aria-describedby="website"
-                            />
-                          </div>
-                          <div class="form-group">
-                            <label for="website" class="form-text text-muted"
-                              >D.O.B</label
-                            >
-                            <input
-                              type="date"
-                              class="form-control"
-                              id="dob"
-                              aria-describedby="dob"
-                            />
-                          </div>
-                        </form>
+                   <%= form_with scope: :user,  local: true do |form| %>
+                       
+                      <div class="form-group">
+                      <label for="bio" class="form-text text-muted"
+                          >Bio</label
+                      >
+                      <%= form.text_field :bio ,:placeholder=> "bio" , :class => "form-control"%>          
+                      </div>
+                      <div class="form-group">
+                      <label for="location" class="form-text text-muted"
+                          >Location</label
+                      >
+                        <%= form.text_field :location ,:placeholder=> "Location" , :class => "form-control"%>          
+                      </div>
+                      <div class="form-group">
+                      <label for="website" class="form-text text-muted"
+                          >Website</label
+                      >
+                      <%= form.text_field :website ,:placeholder=> "Website" , :class => "form-control"%>          
+                      </div>
+                      <div class="form-group">
+                      <label for="website" class="form-text text-muted"
+                          >D.O.B</label
+                      >
+                      <%= form.date_field :dob , :class => "form-control" %>
+                        
+                      </div>
+                      <div class="form-group">
+                        <%= form.submit "Save Changes", :class => "btn btn-light"%>        
+                      </div>
+                  <% end %>
                       </div>
                       <div class="modal-footer">
                         <button
@@ -176,7 +151,7 @@
                     d="M19.708 2H4.292C3.028 2 2 3.028 2 4.292v15.416C2 20.972 3.028 22 4.292 22h15.416C20.972 22 22 20.972 22 19.708V4.292C22 3.028 20.972 2 19.708 2zm.792 17.708c0 .437-.355.792-.792.792H4.292c-.437 0-.792-.355-.792-.792V6.418c0-.437.354-.79.79-.792h15.42c.436 0 .79.355.79.79V19.71z"
                   ></path>
                 </svg>
-                <small>Joined June 2011</small>
+                <small>Joined <%= @userModel["date_joined"] %> </small>
               </div>
               <div class="follow">
                 <p class="card-text">
