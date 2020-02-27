@@ -60,7 +60,9 @@ class UsersController < ApplicationController
         redirect_to new_user_path
       else
         @user.add(user_params[:user_name], user_params[:password], user_params[:email])
-        @user.save
+        @userMail = {username:user_params[:user_name], email:user_params[:email]}
+        # @user.save
+        UserMailer.with(user: user_params[:email], username:user_params[:user_name]).welcome_email.deliver_now
         # render plain: user_params.inspect
         redirect_to new_user_path
        end
