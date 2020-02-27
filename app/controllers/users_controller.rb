@@ -20,10 +20,24 @@ class UsersController < ApplicationController
 
     def update
       @user = User.new()
-      @user.profile_update(session[:userName], user_params[:bio], user_params[:location], user_params[:date_of_birth], user_params[:website])
+      
+      if user_params[:image].blank?
+        image_url = @user.fetch_user(session[:userName])["profile_image_url"]
+      else
+        blob = ActiveStorage::Blob.create_after_upload!(
+          io: user_params[:image],
+          filename: user_params[:image].original_filename,
+          content_type: user_params[:image].content_type
+        )
+        image_url = url_for(blob)
+        # session[:url] = url_for(blob).inspect
+      end
+      @user.profile_update(session[:userName], user_params[:bio], user_params[:location], user_params[:date_of_birth], user_params[:website], image_url )
       redirect_to user_path(session[:userName])
+      
     end
   
+
     def create
       @user = User.new()
       if @user.exists(user_params[:user_name], user_params[:email]) == "username already exists"
@@ -90,7 +104,7 @@ class UsersController < ApplicationController
 
     private
         def user_params
-            params.require(:user).permit(:user_name, :email, :password, :bio, :location, :date_of_birth, :website)
+            params.require(:user).permit(:user_name, :email, :password, :bio, :location, :date_of_birth, :website, :image)
         end
     
 end
