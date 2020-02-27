@@ -6,9 +6,12 @@
     <% elsif type == "info" %>
         <div class= "alert alert-danger"><%= msg %> </div>
     <% end %>
-<% end %>
-<div class="container" id="container">
-  <div class="form-container sign-up-container">       
+<% end %> 
+<h2>Welcome to Twitter (Quasar Version)</h2>
+<div class="body mt-4">
+
+<div class="container1" id="container">
+  <div class="form-container sign-up-container form">       
      <%= form_with scope: :user, url: users_path,  local: true do |form| %>
          <h1 class="h1">Create Account</h1>
             <%= form.text_field :user_name ,:placeholder=> "Username" , :class => "input"%>          
@@ -19,7 +22,7 @@
           
         <% end %>
       </div>
-      <div class="form-container sign-in-container">
+      <div class="form-container sign-in-container form">
       
         <%= form_with scope: :user, url: login_path,  local: true do |form| %>
                 <h1 class="h1">Sign In</h1>
@@ -49,7 +52,7 @@
         </div>
       </div>
     </div>
-
+</div>
 <script>
     const signUpButton = document.getElementById("signUp");
     const signInButton = document.getElementById("signIn");

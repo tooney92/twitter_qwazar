@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
     # require "scrypt"
-    # before_action :set_user, only: [:show, :edit, :update, :destroy]
+     before_action :logged_in?, :only => [:index,:show, :edit, :destroy, :update]
     # GET /users
     # GET /users.json
     def new
@@ -25,8 +25,13 @@ class UsersController < ApplicationController
     # GET /users/1/edit
     def edit
     end
-    # POST /users
-    # POST /users.json
+
+    def update
+      @user = User.new()
+      @user.profile_update(session[:userName], user_params[:bio], user_params[:location], user_params[:date_of_birth], user_params[:website])
+      redirect_to user_path(session[:userName])
+    end
+  
     def create
       @user = User.new()
       if @user.exists(user_params[:user_name], user_params[:email]) == "username already exists"
@@ -57,8 +62,8 @@ class UsersController < ApplicationController
         @user.add(user_params[:user_name], user_params[:password], user_params[:email])
         @user.save
         # render plain: user_params.inspect
-        redirect_to login_path
-      end
+        redirect_to new_user_path
+       end
         # render plain: user_params.inspect
     end
 
@@ -68,26 +73,31 @@ class UsersController < ApplicationController
 
     def login_user
         @user = User.new()
-        userName = @user.fetch_user(user_params[:user_name])["username"]
         status = @user.auth(user_params[:user_name], user_params[:password])
         if status.is_a?(String)
             flash[:error] = "invalid user name"
-            redirect_to login_path
+            redirect_to new_user_path
         elsif status == false
             flash[:error] = "invalid password"
-            redirect_to login_path
+            redirect_to new_user_path
         else
-            # render plain: 
+            userName = @user.fetch_user(user_params[:user_name])["username"]       
             session[:userName] = userName
-            user_id = @user.getkey(session[:userName])            
-            redirect_to user_path(user_id)
+            user_id = @user.getkey(session[:userName])
+            redirect_to user_path(userName)
         end
-        
     end
+
+    def log_out
+      session[:userName] = nil
+      flash[:alert] = "logged out"
+      redirect_to new_user_path
+    end
+
 
     private
         def user_params
-            params.require(:user).permit(:user_name, :email, :password)
+            params.require(:user).permit(:user_name, :email, :password, :bio, :location, :date_of_birth, :website)
         end
     
 end

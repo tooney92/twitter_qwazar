@@ -5,7 +5,7 @@
 	box-sizing: border-box;
 }
 
-body {
+.body {
 	background: #f6f5f7;
 	display: flex;
 	justify-content: center;
@@ -44,7 +44,7 @@ a {
 	margin: 15px 0;
 }
 
-button {
+.button {
 	border-radius: 20px;
 	border: 1px solid rgba(29,161,242,1.00);
 	background-color: rgba(29,161,242,1.00);
@@ -57,20 +57,20 @@ button {
 	transition: transform 80ms ease-in;
 }
 
-button:active {
+.button:active {
 	transform: scale(0.95);
 }
 
-button:focus {
+.button:focus {
 	outline: none;
 }
 
-button.ghost {
+.button.ghost {
 	background-color: transparent;
 	border-color: #FFFFFF;
 }
 
-form {
+.form {
 	background-color: #FFFFFF;
 	display: flex;
 	align-items: center;
@@ -81,7 +81,7 @@ form {
 	text-align: center;
 }
 
-input {
+.input {
 	background-color: #eee;
 	border: none;
 	padding: 12px 15px;

@@ -7,12 +7,17 @@ class User
         @email = email
     end
     def save
+        @auth =
         @id = $redis.incr("users")
-        $redis.hmset("user:#{@id}", "username", @username, "password", @password, "email", @email, "date_joined", Time.now().strftime("%B, %Y"), "salt", @salt)
+        $redis.hmset("user:#{@id}", "username", @username, "password", @password, "email", @email, "date_joined", Time.now().strftime("%B, %Y"), "salt", @salt, "bio", "nil", "location", "nil", "date_of_birth", "nil", "website", "nil", "profile_image_url", "nil")
         $redis.set(@username, @id)
         $redis.sadd("email", @email)
         $redis.sadd("username", @username)
         return true
+    end
+
+    def profile_update(username, bio, location, date_of_birth, website)
+        $redis.hmset("user:#{getkey(username)}", "bio", bio, "location", location, "date_of_birth", date_of_birth, "website", website)
     end
 
     def auth(username, password)
@@ -51,8 +56,5 @@ class User
             return false
         end
     end
-    #$.sadd("myset", "mail")
-    # self.salt = ActiveSupport::SecureRandom.base64(8)
-    # self.hashed_password = Digest::SHA2.hexdigest(self.salt + submitted_password)
 
 end
