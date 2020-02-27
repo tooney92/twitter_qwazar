@@ -1,27 +1,66 @@
-<%= form_with scope: :user, url: users_path,  local: true do |form| %>
-  <p>
-    <%= form.label :user_name %><br>
-    <%= form.text_field :user_name, :class => "form-control" %>
-  </p>
- 
-  <p>
-    <%= form.label :email %><br>
-    <%= form.email_field :email, :class => "form-control"%>
-  </p>
- 
-  <p>
-    <%= form.label :password %><br>
-    <%= form.password_field :password, :class => "form-control" %>
-  </p>  
+<div class="container" id="container">
+  <div class="form-container sign-up-container">       
+     <%= form_with scope: :user, url: users_path,  local: true do |form| %>
+         <h1 class="h1">Create Account</h1>
+            <%= form.text_field :user_name ,:placeholder=> "Username" , :class => "input"%>          
+            <%= form.email_field :email, :placeholder=> "Email" , :class => "input" %>         
+            <%= form.password_field :password, :placeholder=>"Password" , :class => "input", :id=>"pass" %>
+            <input type="checkbox" onclick="myFunction()" />
+            <%= form.submit "Sign Up", :class => "button"%>          
+          
+        <% end %>
+      </div>
+      <div class="form-container sign-in-container">
+      
+        <%= form_with scope: :user, url: users_path,  local: true do |form| %>
+                <h1 class="h1">Sign In</h1>
+            <%= form.email_field :email, :placeholder=> "Email" , :class => "input" %>         
+            <%= form.password_field :password, :placeholder=>"Password" , :class => "input" %>           
+            <%= form.submit "Sign In", :class => "button"%>           
+          
+        <% end %>
+      </div>
 
-  <p>
-    <%= form.label :confirm_password %><br>
-    <%= form.password_field :confirm_password, :class => "form-control" %>
-  </p>
+      <div class="overlay-container">
+        <div class="overlay">
+          <div class="overlay-panel overlay-left">
+              <img src="https://help.twitter.com/content/dam/help-twitter/brand/logo.png" alt="" width="200px">
+            <h1 class="h1">Welcome Back!</h1>
+            <p>
+              To keep connected with us please login with your personal info
+            </p>
+            <button class="ghost button" id="signIn">Sign In</button>
+          </div>
+          <div class="overlay-panel overlay-right">
+            <img src="https://help.twitter.com/content/dam/help-twitter/brand/logo.png" alt="" width="200px">
+            <h1 class="h1">Hello, Friend!</h1>
+            <p>Enter your personal details and start tweeting</p>
+            <button class="ghost button" id="signUp">Sign Up</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <p>
-    <%= form.submit "Sign Up", :class => "btn, btn-primary"%>
-  </p>
+<script>
+    const signUpButton = document.getElementById("signUp");
+    const signInButton = document.getElementById("signIn");
+    const container = document.getElementById("container");
 
-  
-<% end %>
+    signUpButton.addEventListener("click", () => {
+      container.classList.add("right-panel-active");
+    });
+
+    signInButton.addEventListener("click", () => {
+      container.classList.remove("right-panel-active");
+    });
+
+    const myFunction =()=>{
+      let x = document.getElementById("pass")
+      if(x.type === "password")
+      {
+        x.type ="text"
+      }else{
+        x.type ="password"
+      }
+    }
+</script>

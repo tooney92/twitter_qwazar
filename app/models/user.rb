@@ -8,6 +8,7 @@ class User
         @id = $redis.incr("users")
         $redis.hmset("user:#{@id}", "username", @username, "password", @password, "email", @email)
         $redis.set(@username, @id)
+        
         return true
     end
 

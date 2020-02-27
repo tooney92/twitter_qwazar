@@ -1,15 +1,109 @@
-/*
- * This is a manifest file that'll be compiled into application.css, which will include all the files
- * listed below.
- *
- * Any CSS and SCSS file within this directory, lib/assets/stylesheets, or any plugin's
- * vendor/assets/stylesheets directory can be referenced here using a relative path.
- *
- * You're free to add application-wide styles to this file and they'll appear at the bottom of the
- * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
- * files in this directory. Styles in this file should be added after the last require_* statement.
- * It is generally better to create a new file per style scope.
- *
- *= require_tree .
- *= require_self
- */
+.container {
+  margin-top: 20px;
+}
+svg {
+  height: 50px;
+}
+
+.heading {
+  display: flex;
+}
+
+.star {
+  margin-left: 400px;
+}
+.search {
+  border-radius: 40px;
+  height: 50px;
+}
+.ic {
+  display: flex;
+  justify-content: space-between;
+}
+.m {
+  display: flex;
+  width: 150px;
+}
+.c {
+  display: flex;
+}
+.btn1 {
+  border-radius: 40px;
+  width: 100px;
+  height: 35px;
+}
+.title {
+  display: flex;
+}
+.text {
+  font-size: 1.25em;
+  margin-top: 10px;
+}
+
+.line {
+  height: 10px;
+  background-color: black;
+}
+.icons {
+  display: flex;
+}
+.heading2 {
+  display: flex;
+}
+.arrow {
+  width: 40px;
+  margin-top: 10px;
+}
+.img {
+  margin-top: -90px;
+}
+
+.lo {
+  width: 30px;
+}
+.location {
+  display: flex;
+  flex-direction: row;
+}
+.follow {
+  display: flex;
+}
+.user-profile {
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn2 {
+  border-radius: 40px;
+  height: 40px;
+  width: 120px;
+}
+path {
+  fill: rgba(29, 161, 242, 1);
+}
+
+.modal1 {
+  border-radius: 20px;
+}
+
+.fr-details {
+  display: flex;
+  justify-content: space-between;
+}
+.btf:hover {
+  background-color: blueviolet;
+}
+.btf:hover span {
+  display: none;
+}
+.btf:hover:before {
+  content: "Unfollow";
+}
+.de {
+  display: flex;
+  flex-direction: column;
+}
+.urd {
+  display: flex;
+  flex-direction: inherit;
+}
