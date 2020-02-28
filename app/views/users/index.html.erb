@@ -7,7 +7,7 @@
               ></path>
             </svg>
           </div>
-             <%= form_with scope: :tweet, url: '/post_tweet',  local: true do |form| %>
+             <%= form_with scope: :tweet, url: '/post_tweet',  remote: true do |form| %>
           <div class="card">
             <div class="card-body">
               <div class="card-title title">
@@ -70,9 +70,10 @@
           </div>
           <% end %>
           <div class="line"></div>
-          <%# <%= @posts %>  
+          <%# <%= @posts %>
+          <div class="dambatta">  
           <% @posts.each do |post|  %>
-          <div class="card mb-3">
+          <div class="card mb-3 " >
             <div class="card-body">
               <div class="card-title title ">
                 <img
@@ -88,12 +89,12 @@
                 <%=  @user.getname(post["user_id"]) %> <span class="text-muted"> @<%=  @user.getname(post["user_id"]) %> . <%= time_ago_in_words(post["time"])  %></span>
                 </p>
               </div>
-
-              <div class="twt">
+                  <div id="tweet">                  
+              <div class="twt" >
                 <p>
                   <%= post["body"] %>
                 </p>
-              </div>
+              </div></div>
               <div class="icons">
                 <svg>
                   <path
@@ -122,3 +123,4 @@
             </div>
           </div>
         <% end %>
+        </div>

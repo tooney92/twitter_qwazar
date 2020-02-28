@@ -20,9 +20,14 @@ class PostsController < ApplicationController
       @id = $redis.SET("next_post_id", 1)
       
     end
+    @user = User.new()
+    @custom_img = @user.fetch_user(session[:userName])["profile_image_url"]
     @text = "i love you"
     @model = Post.new(current_user_id, @id, post_params[:tweet])
+    @time = "less than a minute ago"
     if @model.create
+      ActionCable.server.broadcast 'tweet_channel',
+      post: {post:post_params[:tweet], username:session[:userName], image: @custom_img, time:@time}
      redirect_to users_path
     else
       render plain: "failed".inspect
@@ -57,6 +62,7 @@ class PostsController < ApplicationController
 
     respond_to do |format|
       if @post.save
+       
         format.html { redirect_to @post, notice: 'Post was successfully created.' }
         format.json { render :show, status: :created, location: @post }
       else
