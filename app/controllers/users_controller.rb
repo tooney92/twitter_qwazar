@@ -7,15 +7,25 @@ class UsersController < ApplicationController
     end
 
     def index
-        @user = User.new()
-      # render plain: "opop"
+      @user = User.new()
+      @post = Post.new()
+      user_id = @user.getkey(@post.user(current_user_id))
+      @userModel = @user.fetch_user(session[:userName])
+        @post = Post.new(current_user_id)
+        @posts = @post.all(user_id)
+      # render plain:   
     end
     # GET /users/1
     # GET /users/1.json
     def show
-       user = User.new()
+       @user = User.new()
       # @userModel = User.fetch_user( 1 )
-       @userModel = user.fetch_user(session[:userName])
+       @userModel = @user.fetch_user(session[:userName])
+       @post = Post.new(current_user_id)
+       user_id = @user.getkey(@post.user(current_user_id))
+       @posts = @post.all(user_id)
+       @model = Follower.new("", current_user_id)
+       @followers =  @model.myFollower
       #  render plain: @userModel.inspect
     end
     def follow
