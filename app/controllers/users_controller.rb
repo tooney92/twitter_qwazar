@@ -150,7 +150,7 @@ class UsersController < ApplicationController
       if $redis.sismember("email", user_params[:email])
         @username = $redis.get(user_params[:email])
         token = @user.set_token(user_params[:email])
-        @generated_url = "/password_reset/#{token}"
+        @generated_url = "password_reset/#{token}"
         UserMailer.with(email: user_params[:email],username: @username , generated_url: @generated_url).reset_password.deliver_now
         # redirect_to "/password_reset/#{token}"
         flash[:success] = "Mail sent successfully"
