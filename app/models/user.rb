@@ -9,7 +9,7 @@ class User
     def save
         @auth =
         @id = $redis.incr("users")
-        $redis.hmset("user:#{@id}", "username", @username, "password", @password, "email", @email, "date_joined", Time.now().strftime("%B, %Y"), "salt", @salt, "bio", "nil", "location", "nil", "date_of_birth", "nil", "website", "nil", "profile_image_url", "nil", "profile_banner_url", "nil")
+        $redis.hmset("user:#{@id}", "username", @username, "password", @password, "email", @email, "date_joined", Time.now().strftime("%B, %Y"), "salt", @salt, "bio", "nil", "location", "nil", "date_of_birth", "nil", "website", "nil", "profile_image_url", "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTVsThWV87XN3bvVT3DYGy7v7lL6b4rza8saDmVyVK6hGWy-MQt", "profile_banner_url", "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQhtV91m6SV2Yyt72b5a_2OaKMHtqcTdUQm-3YeVIGmYpbLPEKX")
         $redis.set(@username, @id)
         $redis.set(@id, @username)
         $redis.set(@email, @username)
@@ -26,13 +26,16 @@ class User
         if $redis.get(username) == nil
             return "sorry invalid name!"
         else
-            passwords = Digest::SHA2.hexdigest(fetch_user(username)["salt"] + password.to_s)
-            return passwords == fetch_user(username)["password"]
-        end
-    end
+            if $redis.sismember("username", username)
+                passwords = Digest::SHA2.hexdigest(fetch_user(username)["salt"] + password.to_s)
+                return passwords == fetch_user(username)["password"]
+            else
+                username = $redis.get(username)
+                passwords = Digest::SHA2.hexdigest(fetch_user(username)["salt"] + password.to_s)
+                return passwords == fetch_user(username)["password"]
+            end
 
-    def user_id
-        return @id
+        end
     end
 
     def getkey(username)
@@ -60,10 +63,7 @@ class User
     end
 
     def set_token(email)
-        token = SecureRandom.base64(8)
-        if token[0] == "/"
-            token = SecureRandom.base64(8)
-        end
+        token = SecureRandom.uuid
         $redis.set(token, email)
         return token
     end
@@ -76,9 +76,11 @@ class User
         return $redis.get(email)
     end
 
-    def hash_password(password)
+    def hash_and_update_password(user_id, password)
+        # sample_user = fetch_user("test94")
         salt = SecureRandom.base64(8)
-        encrypted_password = Digest::SHA2.hexdigest(salt + password)
+        new_encrypted_password = Digest::SHA2.hexdigest(salt + password)
+        $redis.hmset("user:#{user_id}", "salt", salt, "password", new_encrypted_password)
     end
 
 end

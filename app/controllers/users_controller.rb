@@ -8,38 +8,11 @@ class UsersController < ApplicationController
   end
   
   def show
-    # https://pbs.twimg.com/profile_images/469997005582790656/iGxrQ1FS_400x400.jpeg
-    # https://pbs.twimg.com/media/ERes8ClVAAAT47S?format=jpg&name=medium
     @user = User.new()
     user = params[:id]
-    @user_profile_url = ""
-    @user_banner_url = ""
-
-      if  $redis.get(user) == nil
-        render plain: "sorry user does not exist!"
-
-      elsif  @user.fetch_user(user)["profile_image_url"] == "nil" and @user.fetch_user(user)["profile_banner_url"] == "nil" 
-        @user_profile_url = "https://pbs.twimg.com/profile_images/469997005582790656/iGxrQ1FS_400x400.jpeg"
-        @user_banner_url = "https://pbs.twimg.com/media/ERes8ClVAAAT47S?format=jpg&name=medium"
-        
-        
-      elsif  @user.fetch_user(user)["profile_banner_url"] != "nil" and @user.fetch_user(user)["profile_image_url"] != "nil"
-        @user_profile_url = @user.fetch_user(user)["profile_image_url"]
-        @user_banner_url = @user.fetch_user(user)["profile_banner_url"]
-        
-      elsif  @user.fetch_user(user)["profile_banner_url"] != "nil" and @user.fetch_user(user)["profile_image_url"] == "nil"
-        @user_profile_url = "https://pbs.twimg.com/profile_images/469997005582790656/iGxrQ1FS_400x400.jpeg"
-        @user_banner_url = @user.fetch_user(user)["profile_banner_url"]
-
-      elsif  @user.fetch_user(user)["profile_banner_url"] == "nil" and @user.fetch_user(user)["profile_image_url"] != "nil"
-        @user_profile_url = @user.fetch_user(user)["profile_image_url"]
-        @user_banner_url = "https://pbs.twimg.com/media/ERes8ClVAAAT47S?format=jpg&name=medium"
-        
-      else
-        @userName = @user.fetch_user(user)["username"]
-        @user_id = @user.getkey(user)
-      end
-    end
+    @user_profile_url = @user.fetch_user(user)["profile_image_url"]
+    @user_banner_url =  @user.fetch_user(user)["profile_banner_url"]
+  end
     
     def edit
     end
@@ -128,10 +101,19 @@ class UsersController < ApplicationController
             flash[:error] = "invalid password"
             redirect_to login_path
         else
-            userName = @user.fetch_user(user_params[:user_name])["username"]       
-            session[:userName] = userName
-            user_id = @user.getkey(session[:userName])
-            redirect_to user_path(userName)
+            if $redis.sismember("username", user_params[:user_name])
+              userName = @user.fetch_user(user_params[:user_name])["username"]       
+              session[:userName] = userName
+              user_id = @user.getkey(session[:userName])
+              redirect_to user_path(userName)
+              # render plain: userName
+            else
+              userName = $redis.get(user_params[:user_name])
+              session[:userName] = userName
+              user_id = @user.getkey(session[:userName])
+              redirect_to user_path(userName)
+              # render plain: username
+          end
         end
     end
 
@@ -172,7 +154,17 @@ class UsersController < ApplicationController
       former = @user.fetch_user(user)
       user_key = @user.getkey(user)
       # $redis.hgetall("user:#{user_key}", "password", user_params[:password])
-      render plain: "#{user}, #{user_key} #{user_params[:password]}"
+      @user.hash_and_update_password(user_key, user_params[:password])
+      new_details = @user.fetch_user(user)
+      render plain: "#{former}, \n \n \n #{new_details} \n\n\n #{user_params[:password]}"
+    end
+
+
+    def fetch_allusers
+      # .map{ |num| num*2}
+        @model = User.new()
+        users_data = $redis.smembers("username").map{ |user| @model.fetch_user(user)}
+        render plain: users_data
     end
 
 

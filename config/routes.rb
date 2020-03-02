@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   post "/forgot_password" => "users#mail_password_reset"
   get "/password_reset/:token" => "users#password_reset", :method => 'get'
   post "/password_reset/:token" => "users#update_password"
+  get "/fetch" => "users#fetch_allusers"
 
  
   root "users#new"
