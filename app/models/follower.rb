@@ -1,28 +1,28 @@
 class Follower
-    def initialize(followers_id =" ", following_id = " ")
+    def initialize(followers_id=0, following_id=0)
         @followersId = followers_id # my follower
         @followingId = following_id # people i'm following
     end
 
     #people following me
     def myFollower
-        @myfollower = $redis.ZRANGE("followers:#{@following_id}", 0, -1)
+        @myfollower = $redis.ZRANGE("followers:#{@followingId}", 0, -1)
         return @myfollower
     end
 
     #people i"m following
     def myFollowing
-        @myfollowing = $redis.ZRANGE("following:#{@followersId}", 0, -1)
+        @myfollowing = $redis.ZRANGE("following:#{@followingId}", 0, -1)
         return @myfollowing
     end
 
     #action to follow a person
     def Follow
         time = Time.now.to_i
-        $redis.ZADD("followers:#{@followingId}", time, @followersId)
-        if $redis.ZRANGE("followers:#{@followingId}", 0, -1).include?(@followersId)
+        $redis.ZADD("followers:#{@followersId}", time, @followingId)
+        if $redis.ZRANGE("followers:#{@followersId}", 0, -1).include?(@followingId)
             #add the user to the list of people you are following
-            $redis.ZADD("following:#{@followersId}", time, @followingId)
+            $redis.ZADD("following:#{@followingId}", time, @followersId)
             return true
         else
             return false
@@ -30,12 +30,9 @@ class Follower
     end
 
     def unfollow
-        $redis.ZREM("followers:#{@followingId}", @followersId)
-        if $redis.ZRANGE("followers:#{@followingId}", 0, -1).include?(@followersId)
-            return false
-        else
-            return true
-        end
+        $redis.ZREM("followers:#{@followersId}", @followingId)
+        $redis.ZREM("following:#{@followingId}", @followersId)
+        return true
         
     end
 end

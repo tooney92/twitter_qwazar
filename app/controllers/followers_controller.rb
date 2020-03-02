@@ -4,13 +4,19 @@ class FollowersController < ApplicationController
   # GET /followers
   # GET /followers.json
   def index
-    @model = Follower.new("1001", "1000")
-    render plain: @model.myFollowing.inspect
+    # @model = Follower.new("1001", "1000")
+    # render plain: @model.myFollowing.inspect
+    @user = User.new()
+    @userModel = @user.fetch_user(session[:userName])
+    @model = Follower.new("0", current_user_id)
+    @followers =  @model.myFollower
+    @model = Follower.new("0", current_user_id)
+    @myFollowing = @model.myFollowing
   end
 
   def following
-    @model = Follower.new("1015", "1000")
-    render plain: @model.myFollower.inspect
+    @model = Follower.new("0", current_user_id)
+    @myFollowing = @model.myFollower
   end
 
   # GET /followers/1
@@ -18,22 +24,37 @@ class FollowersController < ApplicationController
   def show
   end
 
+  def isfollow
+    @model = Follower.new("0", "1")
+    if @model.myFollower.include?(2)
+      render plain: "true".inspect
+    else
+      render plain: "false".inspect
+    end
+    
+  end
+
   # GET /followers/new
   def new
     if params['id'] #id of the person you want to follow
-      @model = Follower.new("1015", params['id'])
+      @model = Follower.new(params['id'], current_user_id)
       if @model.Follow
-        render plain: "success".inspect
+        # render plain: "success".inspect
+        redirect_back fallback_location: root_path
+      else
+        # render plain: "failed".inspect
+        redirect_back fallback_location: root_path
       end
     end
-    #render plain: "failed".inspect
+    
   end
 
   def unfollow
     if params['id'] #id of the person you want to follow
-      @model = Follower.new("1015", params['id'])
+      @model = Follower.new(params['id'], current_user_id)
       if @model.unfollow
-        render plain: "success".inspect
+        # render plain: "success".inspect
+        redirect_back fallback_location: root_path
       end
     end
     #render plain: "failed".inspect

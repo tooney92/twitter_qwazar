@@ -7,15 +7,27 @@ class UsersController < ApplicationController
     end
 
     def index
-        @user = User.new()
-      # render plain: "opop"
+      @user = User.new()
+      @post = Post.new()
+      user_id = @user.getkey(@post.user(current_user_id))
+      @userModel = @user.fetch_user(session[:userName])
+        @post = Post.new(current_user_id)
+        @posts = @post.all(user_id)
+      # render plain:   
     end
     # GET /users/1
     # GET /users/1.json
     def show
-       user = User.new()
+       @user = User.new()
       # @userModel = User.fetch_user( 1 )
-       @userModel = user.fetch_user(session[:userName])
+       @userModel = @user.fetch_user(session[:userName])
+       @post = Post.new(current_user_id)
+       user_id = @user.getkey(@post.user(current_user_id))
+       @posts = @post.all(user_id)
+       @model = Follower.new("", current_user_id)
+       @followers =  @model.myFollower
+       @model2 = Follower.new("0", current_user_id)
+       @myFollowing = @model2.myFollowing
       #  render plain: @userModel.inspect
     end
     def follow
@@ -40,7 +52,18 @@ class UsersController < ApplicationController
         image_url = url_for(blob)
         # session[:url] = url_for(blob).inspect
       end
-      @user.profile_update(session[:userName], user_params[:bio], user_params[:location], user_params[:date_of_birth], user_params[:website], image_url )
+      if user_params[:banner].blank?
+        banner_url = @user.fetch_user(session[:userName])["profile_banner_url"]
+      else
+        blob = ActiveStorage::Blob.create_after_upload!(
+          io: user_params[:banner],
+          filename: user_params[:banner].original_filename,
+          content_type: user_params[:banner].content_type
+        )
+        banner_url = url_for(blob)
+        # session[:url] = url_for(blob).inspect
+      end
+      @user.profile_update(session[:userName], user_params[:bio], user_params[:location], user_params[:date_of_birth], user_params[:website], image_url,banner_url )
       redirect_to user_path(session[:userName])
       
     end
@@ -114,7 +137,7 @@ class UsersController < ApplicationController
 
     private
         def user_params
-            params.require(:user).permit(:user_name, :email, :password, :bio, :location, :date_of_birth, :website, :image)
+            params.require(:user).permit(:user_name, :email, :password, :bio, :location, :date_of_birth, :website, :image, :banner)
         end
     
 end
