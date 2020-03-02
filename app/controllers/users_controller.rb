@@ -1,18 +1,32 @@
 class UsersController < ApplicationController
   before_action :logged_in?, :only => [:edit, :destroy, :update]
 
-  def new
-  end
-  
-  def index
-  end
-  
-  def show
-    @user = User.new()
-    user = params[:id]
-    @user_profile_url = @user.fetch_user(user)["profile_image_url"]
-    @user_banner_url =  @user.fetch_user(user)["profile_banner_url"]
-  end
+    def index
+      @user = User.new()
+      @post = Post.new()
+      user_id = @user.getkey(@post.user(current_user_id))
+      @userModel = @user.fetch_user(session[:userName])
+        @post = Post.new(current_user_id)
+        @posts = @post.all(user_id)
+      # render plain:   
+    end
+    # GET /users/1
+    # GET /users/1.json
+    def show
+       @user = User.new()
+      # @userModel = User.fetch_user( 1 )
+       @userModel = @user.fetch_user(session[:userName])
+       @post = Post.new(current_user_id)
+       user_id = @user.getkey(@post.user(current_user_id))
+       @posts = @post.all(user_id)
+       @model = Follower.new("", current_user_id)
+       @followers =  @model.myFollower
+       @model2 = Follower.new("0", current_user_id)
+       @myFollowing = @model2.myFollowing
+      #  render plain: @userModel.inspect
+    end
+    def follow
+    end
     
     def edit
     end
@@ -29,6 +43,7 @@ class UsersController < ApplicationController
           content_type: user_params[:image].content_type
         )
         image_url = url_for(blob)
+        # session[:url] = url_for(blob).inspect
       end
       if user_params[:banner].blank?
         banner_url = @user.fetch_user(session[:userName])["profile_banner_url"]
@@ -41,9 +56,8 @@ class UsersController < ApplicationController
         banner_url = url_for(blob)
         # session[:url] = url_for(blob).inspect
       end
-      @user.profile_update(session[:userName], user_params[:bio], user_params[:location], user_params[:date_of_birth], user_params[:website], image_url , banner_url)
-      # render plain: @user.fetch_user(session[:userName])
-      redirect_to user_path(session[:userName])    
+      @user.profile_update(session[:userName], user_params[:bio], user_params[:location], user_params[:date_of_birth], user_params[:website], image_url,banner_url )
+      redirect_to user_path(session[:userName])
       
     end
   
@@ -78,10 +92,13 @@ class UsersController < ApplicationController
         flash[:error] = "invalid email! no spaces!"
         redirect_to new_user_path
       else
-        @user.add(user_params[:user_name].strip, user_params[:password], user_params[:email].strip)
+        @user.add(user_params[:user_name], user_params[:password], user_params[:email])
+        # @userMail = {username:user_params[:user_name], email:user_params[:email]}
+        # @user.save
+        UserMailer.with(email: user_params[:email], username:user_params[:user_name]).welcome_email.deliver_now
         @user.save
         # render plain: user_params.inspect
-        redirect_to login_path
+        redirect_to new_user_path
        end
         # render plain: user_params.inspect
     end
@@ -96,10 +113,10 @@ class UsersController < ApplicationController
         status = @user.auth(user_params[:user_name], user_params[:password])
         if status.is_a?(String)
             flash[:error] = "invalid user name"
-            redirect_to login_path
+            redirect_to new_user_path
         elsif status == false
             flash[:error] = "invalid password"
-            redirect_to login_path
+            redirect_to new_user_path
         else
             if $redis.sismember("username", user_params[:user_name])
               userName = @user.fetch_user(user_params[:user_name])["username"]       
@@ -120,7 +137,7 @@ class UsersController < ApplicationController
     def log_out
       session[:userName] = nil
       flash[:alert] = "logged out"
-      redirect_to login_path
+      redirect_to new_user_path
     end
 
     def forgot_password
@@ -129,11 +146,16 @@ class UsersController < ApplicationController
 
     def mail_password_reset
       @user = User.new()
+     
       if $redis.sismember("email", user_params[:email])
+        @username = $redis.get(user_params[:email])
         token = @user.set_token(user_params[:email])
-        @generated_url = "/password_reset/#{token}"
-        redirect_to "/password_reset/#{token}"
-
+        @generated_url = "password_reset/#{token}"
+        UserMailer.with(email: user_params[:email],username: @username , generated_url: @generated_url).reset_password.deliver_now
+        # redirect_to "/password_reset/#{token}"
+        flash[:success] = "Mail sent successfully"
+        redirect_back fallback_location: root_path
+        
       else
         flash[:error] = "email does not exist!"
         redirect_to forgot_password_path
@@ -156,7 +178,8 @@ class UsersController < ApplicationController
       # $redis.hgetall("user:#{user_key}", "password", user_params[:password])
       @user.hash_and_update_password(user_key, user_params[:password])
       new_details = @user.fetch_user(user)
-      render plain: "#{former}, \n \n \n #{new_details} \n\n\n #{user_params[:password]}"
+      redirect_to new_user_path
+      # render plain: "#{former}, \n \n \n #{new_details} \n\n\n #{user_params[:password]}"
     end
 
 

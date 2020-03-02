@@ -14,7 +14,7 @@
   <div class="form-container sign-up-container form">       
      <%= form_with scope: :user, url: users_path,  local: true do |form| %>
          <h1 class="h1">Create Account</h1>
-            <%= form.text_field :user_name ,:placeholder=> "Username" , :class => "input"%>          
+            <%= form.text_field :user_name ,:placeholder=> "Username " , :class => "input"%>          
             <%= form.email_field :email, :placeholder=> "Email" , :class => "input" %>         
             <%= form.password_field :password, :placeholder=>"Password" , :class => "input", :id=>"pass" %>
             <input type="checkbox" onclick="myFunction()" />
@@ -26,10 +26,10 @@
       
         <%= form_with scope: :user, url: login_path,  local: true do |form| %>
                 <h1 class="h1">Sign In</h1>
-            <%= form.text_field :user_name, :placeholder=> "Username" , :class => "input" %>         
+            <%= form.text_field :user_name, :placeholder=> "Username or Email" , :class => "input" %>         
             <%= form.password_field :password, :placeholder=>"Password" , :class => "input" %>           
-            <%= form.submit "Sign In", :class => "button"%>           
-          
+            <%= form.submit "Sign In", :class => "button mb-2"%>   <br>      
+          <%= link_to 'Fogot Password?', forgot_password_path %>
         <% end %>
       </div>
 

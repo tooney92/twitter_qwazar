@@ -46,10 +46,35 @@ class User
             return key
         end
     end
+    def getname(key)
+        username = $redis.get(key)
+        if username == nil 
+            return "sorry user does not exist, check username"
+        else
+            return username
+        end
+    end
+    def getUserImage(key)
+        username = $redis.get(key)
+        image = fetch_user(username)["profile_image_url"]
+        
+        return image
+      
+    end
 
     def fetch_user(username)
         user = $redis.hgetall("user:#{getkey(username)}")
         return user
+    end
+    def fetch_userkey(key)
+        user = $redis.hgetall("user:#{getname(key)}")
+        return user
+    end
+
+    def fetch_allusers
+        model = User.new()
+        users_data = $redis.smembers("username").map{ |user| model.fetch_user(user)}
+        return users_data
     end
 
     def exists(username, email)

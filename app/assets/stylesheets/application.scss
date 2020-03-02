@@ -108,6 +108,14 @@ path {
   flex-direction: inherit;
 }
 
+.drp {
+  position: absolute;
+  z-index: 1;
+  background: #ccc !important;
+  box-shadow: 5px 10px 13px #888888;
+  display: none;
+}
+
 //For Users
 
 // @import url('https://fonts.googleapis.com/css?family=Montserrat:400,800');
@@ -123,7 +131,7 @@ path {
   align-items: center;
   flex-direction: column;
   font-family: "Montserrat", sans-serif;
- 
+
   margin: -20px 0 50px;
 }
 
