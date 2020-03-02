@@ -7,7 +7,7 @@ class Post
 
     def create
         time = Time.now.to_i
-        $redis.HMSET("tweet:#{@postId}","user_id", @userId ,"time",time,"body",@tweet)
+        $redis.HMSET("tweet:41","user_id", @userId ,"time",time,"body",@tweet)
         #@followerModel = Follower.new("", "1000")
         @followers = $redis.ZRANGE("followers:1000", 0, -1)
         @followers << @userId
