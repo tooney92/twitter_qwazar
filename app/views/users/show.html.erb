@@ -12,9 +12,9 @@
             
             <div class="user-head">
               <h3 class="mb-0"> <%= @userModel["username"]%> </h3>
-              <span class="text-muted">1,672 Tweets</span>
+              <span class="text-muted"> <%= @posts.length %> Tweets </span>
             </div>
-           
+        
           </div></div>
        </div>
           <div class="card mb-3">
@@ -169,15 +169,15 @@
               </div>
               <div class="follow">
                 <p class="card-text">
-                  <strong>164</strong>
+                  <strong><%= @myFollowing.length %></strong>
                   <small class="text-muted mr-2"
                     > <%= link_to 'Following', followers_path %>
                   </small>
                 </p>
                 <p class="card-text ">
-                  <strong>200</strong>
+                  <strong>   <%= @followers.length %></strong>
                   <small class="text-muted"
-                    ><a href="follow.html"><%= link_to 'Followers', followers_path %></a></small
+                    ><a href="follow.html"><%= link_to 'Follower(s)', followers_path %></a></small
                   >
                 </p>
               </div>

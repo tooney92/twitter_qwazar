@@ -26,6 +26,8 @@ class UsersController < ApplicationController
        @posts = @post.all(user_id)
        @model = Follower.new("", current_user_id)
        @followers =  @model.myFollower
+       @model2 = Follower.new("0", current_user_id)
+       @myFollowing = @model2.myFollowing
       #  render plain: @userModel.inspect
     end
     def follow
