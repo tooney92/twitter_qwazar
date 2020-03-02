@@ -1,10 +1,5 @@
 class UsersController < ApplicationController
-    # require "scrypt"
-     before_action :logged_in?, :only => [:index,:show, :edit, :destroy, :update]
-    # GET /users
-    # GET /users.json
-    def new
-    end
+  before_action :logged_in?, :only => [:edit, :destroy, :update]
 
     def index
       @user = User.new()
@@ -33,8 +28,6 @@ class UsersController < ApplicationController
     def follow
     end
     
-    # GET /users/new
-    # GET /users/1/edit
     def edit
     end
 
@@ -95,6 +88,9 @@ class UsersController < ApplicationController
       elsif user_params[:user_name].include?" "
         flash[:error] = "invalid user name! no spaces!"
         redirect_to new_user_path
+      elsif user_params[:email].include?" "
+        flash[:error] = "invalid email! no spaces!"
+        redirect_to new_user_path
       else
         @user.add(user_params[:user_name], user_params[:password], user_params[:email])
         # @userMail = {username:user_params[:user_name], email:user_params[:email]}
@@ -113,6 +109,7 @@ class UsersController < ApplicationController
 
     def login_user
         @user = User.new()
+
         status = @user.auth(user_params[:user_name], user_params[:password])
         if status.is_a?(String)
             flash[:error] = "invalid user name"
@@ -121,10 +118,19 @@ class UsersController < ApplicationController
             flash[:error] = "invalid password"
             redirect_to new_user_path
         else
-            userName = @user.fetch_user(user_params[:user_name])["username"]       
-            session[:userName] = userName
-            user_id = @user.getkey(session[:userName])
-            redirect_to user_path(userName)
+            if $redis.sismember("username", user_params[:user_name])
+              userName = @user.fetch_user(user_params[:user_name])["username"]       
+              session[:userName] = userName
+              user_id = @user.getkey(session[:userName])
+              redirect_to user_path(userName)
+              # render plain: userName
+            else
+              userName = $redis.get(user_params[:user_name])
+              session[:userName] = userName
+              user_id = @user.getkey(session[:userName])
+              redirect_to user_path(userName)
+              # render plain: username
+          end
         end
     end
 
@@ -132,6 +138,56 @@ class UsersController < ApplicationController
       session[:userName] = nil
       flash[:alert] = "logged out"
       redirect_to new_user_path
+    end
+
+    def forgot_password
+
+    end
+
+    def mail_password_reset
+      @user = User.new()
+     
+      if $redis.sismember("email", user_params[:email])
+        @username = $redis.get(user_params[:email])
+        token = @user.set_token(user_params[:email])
+        @generated_url = "/password_reset/#{token}"
+        UserMailer.with(email: user_params[:email],username: @username , generated_url: @generated_url).reset_password.deliver_now
+        # redirect_to "/password_reset/#{token}"
+        flash[:success] = "Mail sent successfully"
+        redirect_back fallback_location: root_path
+        
+      else
+        flash[:error] = "email does not exist!"
+        redirect_to forgot_password_path
+      end
+
+    end
+
+
+    def password_reset
+      @user = User.new()
+      user_email = @user.token_get_email(params[:token])
+      # render plain: "#{user_email}, #{@user.email_fetch_user(user_email)} "
+    end
+
+    def update_password
+      @user = User.new()
+      user = $redis.get(@user.token_get_email(params[:token]))
+      former = @user.fetch_user(user)
+      user_key = @user.getkey(user)
+      # $redis.hgetall("user:#{user_key}", "password", user_params[:password])
+      @user.hash_and_update_password(user_key, user_params[:password])
+      new_details = @user.fetch_user(user)
+      redirect_to new_user_path
+      # render plain: "#{former}, \n \n \n #{new_details} \n\n\n #{user_params[:password]}"
+    end
+
+
+    def fetch_allusers
+      # .map{ |num| num*2}
+        @model = User.new()
+        users_data = $redis.smembers("username").map{ |user| @model.fetch_user(user)}
+        render plain: users_data
     end
 
 

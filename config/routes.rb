@@ -11,5 +11,13 @@ Rails.application.routes.draw do
   get "/isfollow"   => "followers#isfollow"
   get "/unfollow"   => "followers#unfollow"
   get "/following"   => "followers#following"
+ 
+  get "/forgot_password" => "users#forgot_password"
+  post "/forgot_password" => "users#mail_password_reset"
+  get "/password_reset/:token" => "users#password_reset", :method => 'get'
+  post "/password_reset/:token" => "users#update_password"
+  get "/fetch" => "users#fetch_allusers"
+
+ 
   root "users#new"
 end
