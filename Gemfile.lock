@@ -237,7 +237,7 @@ DEPENDENCIES
   byebug
   capybara (>= 2.15)
   jbuilder (~> 2.7)
-  pg (= 0.18.1)
+  pg
   puma (~> 4.1)
   rails (~> 6.0.2, >= 6.0.2.1)
   rails_12factor
@@ -248,7 +248,7 @@ DEPENDENCIES
   sass-rails (>= 6)
   scrypt
   selenium-webdriver
-  sqlite3
+  sqlite3 (~> 1.4)
   turbolinks (~> 5)
   tzinfo-data
   web-console (>= 3.3.0)
