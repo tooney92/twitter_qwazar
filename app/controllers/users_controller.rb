@@ -131,7 +131,7 @@ class UsersController < ApplicationController
       @user = User.new()
       if $redis.sismember("email", user_params[:email])
         token = @user.set_token(user_params[:email])
-        @generated_url = "/password_reset/#{user_params[:email]}/#{token}"
+        @generated_url = "/password_reset/#{token}"
         redirect_to "/password_reset/#{token}"
 
       else
