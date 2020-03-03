@@ -18,6 +18,8 @@ Rails.application.routes.draw do
   post "/password_reset/:token" => "users#update_password"
   get "/fetch" => "users#fetch_allusers"
 
+  mount ActionCable.server => '/cable'
+
  
   root "users#new"
 end

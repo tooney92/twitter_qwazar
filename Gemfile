@@ -5,15 +5,13 @@ ruby '2.6.5'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 6.0.2', '>= 6.0.2.1'
-
+# Use sqlite3 as the database for Active Record
 group :development, :test do
   gem 'sqlite3', '~> 1.4'
 end
 group :production do
   gem 'pg'
 end
-
-gem 'rails_12factor', group: :production
 # Use Puma as the app server
 gem 'puma', '~> 4.1'
 # Use SCSS for stylesheets
@@ -61,3 +59,4 @@ end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+gem 'rails_12factor', group: :production
