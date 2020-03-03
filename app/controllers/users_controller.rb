@@ -95,7 +95,7 @@ class UsersController < ApplicationController
         @user.add(user_params[:user_name], user_params[:password], user_params[:email])
         # @userMail = {username:user_params[:user_name], email:user_params[:email]}
         # @user.save
-        UserMailer.with(email: user_params[:email], username:user_params[:user_name]).welcome_email.deliver_now
+        #UserMailer.with(email: user_params[:email], username:user_params[:user_name]).welcome_email.deliver_now
         @user.save
         # render plain: user_params.inspect
         redirect_to new_user_path
