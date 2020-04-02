@@ -9,7 +9,7 @@ class User
     def save
         @auth =
         @id = $redis.incr("users")
-        $redis.hmset("user:#{@id}", "username", @username, "password", @password, "email", @email, "date_joined", Time.now().strftime("%B, %Y"), "salt", @salt, "bio", "nil", "location", "nil", "date_of_birth", "nil", "website", "nil", "profile_image_url", "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTVsThWV87XN3bvVT3DYGy7v7lL6b4rza8saDmVyVK6hGWy-MQt", "profile_banner_url", "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQhtV91m6SV2Yyt72b5a_2OaKMHtqcTdUQm-3YeVIGmYpbLPEKX")
+        $redis.hmset("user:#{@id}", "username", @username, "password", @password, "admin_status", "false", "email", @email, "date_joined", Time.now().strftime("%B, %Y"), "salt", @salt, "bio", "nil", "location", "nil", "date_of_birth", "nil", "website", "nil", "profile_image_url", "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTVsThWV87XN3bvVT3DYGy7v7lL6b4rza8saDmVyVK6hGWy-MQt", "profile_banner_url", "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcQhtV91m6SV2Yyt72b5a_2OaKMHtqcTdUQm-3YeVIGmYpbLPEKX")
         $redis.set(@username, @id)
         $redis.set(@id, @username)
         $redis.set(@email, @username)
@@ -107,5 +107,49 @@ class User
         new_encrypted_password = Digest::SHA2.hexdigest(salt + password)
         $redis.hmset("user:#{user_id}", "salt", salt, "password", new_encrypted_password)
     end
+
+    def delete_user(key)
+        user_name = $redis.get(key)
+        user_key = getkey(user_name)
+        user_email = $redis.hgetall("user:#{user_key}")["email"]
+        $redis.srem("username", user_name)
+        $redis.srem("email", user_email)
+        $redis.del("user:#{user_key}")
+        $redis.del(user_key)
+        $redis.del(user_name)
+        $redis.del(user_email)
+        return "done!"
+    end
+
+    def make_admin(key)
+        $redis.hmset("user:#{key}", "admin_status", true)
+    end
+    def remove_admin(key)
+        $redis.hmset("user:#{key}", "admin_status", false)
+    end
+
+    def edit_user(key, email, username)
+        old_user_name = $redis.get(key)
+        old_user_email = $redis.hgetall("user:#{key}")["email"]
+        new_User_name = username
+        new_User_email = email
+        $redis.del(old_user_name)
+        $redis.del(old_user_email)
+        $redis.srem("email", old_user_email)
+        $redis.srem("username", old_user_name)
+        $redis.hmset("user:#{key}", "username", new_User_name, "email", new_User_email)
+        $redis.mset(key, new_User_name)
+        $redis.set(new_User_name, key)
+        $redis.set(new_User_email, new_User_name)
+        $redis.sadd("email", new_User_email)
+        $redis.sadd("username", new_User_name)
+        # return "#{fetch_user(username)}"
+    end
+
+    # # $redis.set(@id, @username)
+
+    # $redis.del(user_key)
+    # $redis.del(user_email)
+
 
 end

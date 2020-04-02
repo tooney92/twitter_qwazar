@@ -17,6 +17,12 @@ Rails.application.routes.draw do
   get "/password_reset/:token" => "users#password_reset", :method => 'get'
   post "/password_reset/:token" => "users#update_password"
   get "/fetch" => "users#fetch_allusers"
+  get "/admin" => "admin#index"
+  get "users/admin/user/:userid", :to => 'admin#deleteuser', :method => 'delete'
+  get "users/admin/make_admin/:userid", :to => 'admin#make_admin', :method => 'delete'
+  get "users/admin/remove_admin/:userid", :to => 'admin#remove_admin', :method => 'delete'
+  get "users/admin/edit_user/:userid", :to => 'admin#edit_user'
+  post "users/admin/edit_user/:userid", :to => 'admin#update_user'
 
   mount ActionCable.server => '/cable'
 
